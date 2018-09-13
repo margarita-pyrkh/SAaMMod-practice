@@ -8,7 +8,7 @@ const variance = (sequenceOfValues, mathExp) => {
   return sum / sequenceOfValues.length;
 };
 
-const meanSquareDevation = (variance) => Math.sqrt(variance);
+const meanSquareDeviation = (variance) => Math.sqrt(variance);
 
 const lemereGenerator = (a, R0, m, n) => {
   let array = Array(n);
@@ -20,3 +20,37 @@ const lemereGenerator = (a, R0, m, n) => {
 };
 
 const normalizedArry = (array, m) => array.map(element => element / m);
+
+const context = document.getElementById("myChart").getContext('2d');
+const myChart = new Chart(context, {
+    type: 'bar',
+    data: {
+      labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+      datasets: [{
+          label: 'Criteria',
+          data: [12, 19, 17, 16, 13, 18],
+          backgroundColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 0,
+      }]
+    },
+    options: {
+      scales: {
+          xAxes: [{
+              categoryPercentage: 1.0,
+              barPercentage: 1.0
+          }]
+      },
+      title: {
+        display: true,
+        text: 'Гистограмма распределения', // in english later
+        fontSize: 20
+      },
+      legend: {
+        display: false
+      }
+    }
+});
+
+const updateMyChart = () => {
+  myChart.update();
+};
