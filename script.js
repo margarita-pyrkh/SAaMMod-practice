@@ -19,16 +19,16 @@ const lemereGenerator = (a, R0, m, n) => {
   return array;
 };
 
-const normalizedArry = (array, m) => array.map(element => element / m);
+const getNormalizedArray = (array, m) => array.map(element => element / m);
 
 const context = document.getElementById("myChart").getContext('2d');
 const myChart = new Chart(context, {
     type: 'bar',
     data: {
-      labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+      labels: ["", "", "", "", "", "", "", "", "", "", "", "", "", ""],
       datasets: [{
           label: 'Criteria',
-          data: [12, 19, 17, 16, 13, 18],
+          data: [12, 19, 17, 16, 13, 18, 12, 19, 17, 16, 13, 18, 12, 19, 17, 16, 13, 18, 12, 19, 17],
           backgroundColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 0,
       }]
@@ -54,3 +54,76 @@ const myChart = new Chart(context, {
 const updateMyChart = () => {
   myChart.update();
 };
+
+const getPeriodLength = (array) => {
+  const DELTA = 0.00001;
+  const lastValueOfArray = array[array.length - 1];
+  let positions = [];
+  let isFirst = false;
+  array.forEach((element, index) => {
+    if (Math.abs(array[index] - lastValueOfArray) < DELTA) {
+      if (isFirst) {
+        positions[1] = index;
+      } else {
+        isFirst = true;
+        positions[0] = index;
+      }
+    }
+  });
+  const periodLength = positions[1] - positions[0];
+  return periodLength;
+};
+
+const getAperiodicLength = (array, periodLength) => {
+  let aperiodicPrefix = 0;
+  for (let index = 0; index + periodLength < array.length; index++) {
+    if (Math.abs(array[index] - array[index + periodLength]) < DELTA) {
+      aperiodicPrefix = index;
+      break;
+    }
+  };
+  return periodLength + aperiodicPrefix;
+};
+
+const getNumber = (stringValue) => Number.parseInt(stringValue);
+
+const getValuesFromInputs = () => {
+  const r0Value = getNumber(document.getElementById('r_value').value);
+  const aValue = getNumber(document.getElementById('a_value').value);
+  const mValue = getNumber(document.getElementById('m_value').value);
+  const nValue = getNumber(document.getElementById('n_value').value);
+  return [r0Value, aValue, mValue, nValue];
+}
+
+const getRealAndDesiredValues = (array, n) => {
+  let count = 0;
+  for (let index = 1; index < n / 2; index++) {
+    if ((Math.pow(array[2 * index - 1], 2) + Math.pow(list[index * 2], 2)) < 1) {
+      count++;
+    }
+  };
+  const realValue = count * 2 / n;
+  const desiredValue = Math.PI / 4;
+  return [realValue, desiredValue];
+};
+
+const main = () => {
+  let [r0Value, aValue, mValue, nValue] = getValuesFromInputs();
+  const lemereArray = lemereGenerator(aValue, r0Value, mValue, nValue);
+  const normalizedArray = getNormalizedArray(lemereArray, mValue);
+  const mathExp = mathExpectation(
+    normalizedArray.reduce((prev, curr) => prev + curr), 
+    normalizedArray.length
+  );
+  const dispertion = variance(normalizedArray, mathExp);
+  const sqrDeviation = meanSquareDeviation(dispertion);
+
+  const periodLength = getPeriodLength(normalizedArray);
+  const aperiodicLength = getAperiodicLength(normalizedArray, periodLength);
+
+  const [realValue, desiredValue] = getRealAndDesiredValues(normalizedArray, nValue);
+
+};
+
+
+
